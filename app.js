@@ -1,6 +1,6 @@
 const express = require("express"); // loads the express package
 const { engine } = require("express-handlebars"); // loads handlebars for Express
-const port = 8080; // defines the port
+const port = 8050; // defines the port
 const app = express(); // creates the Express application
 
 // defines handlebars engine
@@ -14,7 +14,7 @@ app.set("views", "./views");
 app.use(express.static("public"));
 
 // MODEL (DATA)
-const humans = [
+const projects = [
   { id: "0", name: "Jerome" },
   { id: "1", name: "Mira" },
   { id: "2", name: "Linus" },
@@ -28,26 +28,29 @@ app.get("/", function (request, response) {
   response.render("home.handlebars");
 });
 
-// defines route "/humans"
-app.get("/humans", function (request, response) {
-  const model = { listHumans: humans }; // defines the model
-  // in the next line, you should send the abovedefined
-  // model to the page and not an empty object {}...
-  response.render("humans.handlebars", model);
+// defines route "/about"
+app.get("/about", function (request, response) {
+  const model = { listProjects: projects };
+  response.render("about.handlebars", model);
 });
 
-// defines route "/humans/1"
-app.get("/humans/1", function (request, response) {
-  const model = humans[1]; // defines the model
-  // in the next line, you should send the abovedefined
-  // model to the page and not an empty object {}...
-  response.render("human.handlebars", model);
+// defines route "/contact"
+app.get("/contact", function (request, response) {
+  const model = projects[1];
+  response.render("contact.handlebars", model);
 });
 
-app.get("/humans/:id", function (request, response) {
-  const model = humans[id];
-  const id = request.params.id; // E.g. “1”, “2”, “3”, …
-  response.render("human.handlebars", model);
+// defines route "/login"
+app.get("/login", function (request, response) {
+  const model = projects[1];
+  response.render("login.handlebars", model);
+});
+
+//define route "/about/id"
+app.get("/about/:id", function (request, response) {
+  const id = request.params.id;
+  const model = projects[id];
+  response.render("project.handlebars", model);
 });
 
 // defines the final default route 404 NOT FOUND
