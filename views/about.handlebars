@@ -1,5 +1,21 @@
 <div id="main">
   <div>
+    <h1>Add projects</h1>
+    {{#if isLoggedin}}
+      <div>
+        <form action="/login" method="post">
+          <fieldset>
+            <label for="un">Project name: </label>
+            <input type="text" name="un" id="un" required="required" />
+            <br />
+            <label for="pw">Project description: </label>
+            <input type="password" name="pw" id="pw" required="required" />
+            <br />
+          </fieldset>
+          <input type="submit" value="Add" />
+        </form>
+      </div>
+    {{/if}}
     <h1>List of all projects</h1>
     {{#each listProjects}}
       <div>

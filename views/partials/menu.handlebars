@@ -9,12 +9,14 @@
     <a href="/contact" class="btn btn-link"> Contact </a>
   </section>
   <section class="navbar-section">
-    <a href="/login" class="btn btn-link">
-      <img
-        src="../../public/img/man.png"
-        alt="profil
-      "
-      />
-    </a>
+    {{#if isLoggedin}}
+      <div>Hi,
+        {{name}}! &nbsp; &nbsp;
+        <a href="/logout" class="btn btn-link">Logout</a>
+      </div>
+    {{else}}
+      <a href="/login" class="btn btn-link">
+        Login</a>
+    {{/if}}
   </section>
 </header>

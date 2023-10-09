@@ -14,13 +14,19 @@
   /*border: 3px solid gray;*/
 }
 
-.navbar {
-  background-color: aqua;
-  height: 45px;
+#menu {
+  background-color: rgb(24, 24, 24);
+  height: 60px;
   color: white;
 }
-.btn-link {
-  :white ;
-  height: 25px;
-  padding: 0rem 1rem;
+
+#menu a {
+  color: white;
+  text-decoration: none;
+}
+
+.btn {
+  height: 0rem;
+  padding: 0.75rem 1rem;
+  line-height: 0rem;
 }
