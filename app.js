@@ -153,6 +153,17 @@ app.get("/contact", function (req, res) {
 // ERROR PAGE
 //-------------
 
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    console.log("Error while destroying the session: ", err);
+  });
+  console.log("Logged out");
+  res.redirect("/");
+});
+//-------------
+// ERROR PAGE
+//-------------
+
 // defines the final default route 404 NOT FOUND
 app.use(function (req, res) {
   res.status(404).render("404.handlebars");

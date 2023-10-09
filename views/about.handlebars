@@ -1,7 +1,7 @@
 <div id="main">
   <div>
-    <h1>Add projects</h1>
     {{#if isLoggedin}}
+      <h1>Add projects</h1>
       <div>
         <form action="/login" method="post">
           <fieldset>
@@ -17,14 +17,17 @@
       </div>
     {{/if}}
     <h1>List of all projects</h1>
-    {{#each listProjects}}
-      <div>
-        -
-        {{id}}:
-        <a href="/about/{{id}}">
-          {{name}}
-        </a>
+    <div class="container">
+      <div class="columns">
+        {{#each listProjects}}
+          <div class="card column">
+            <a href="/about/{{id}}" class="text-center projectName">
+              {{name}}
+            </a>
+          </div>
+
+        {{/each}}
       </div>
-    {{/each}}
+    </div>
   </div>
 </div>
