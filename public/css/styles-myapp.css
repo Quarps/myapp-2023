@@ -33,12 +33,22 @@
 
 .card {
   background-color: rgb(29, 29, 58);
-  width: 300px;
-  height: 300px;
+  width: 250px;
+  height: 250px;
   border-radius: 1rem;
   padding: 1rem;
   text-decoration: none;
+  margin: 0.5rem;
 }
 .projectName {
   font-size: 32px;
+}
+
+.form-input,
+.form-label {
+  width: 90%;
+}
+.column {
+  padding: 0rem;
+  margin-bottom: 1rem;
 }

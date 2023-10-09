@@ -1,43 +1,72 @@
 <div id="main">
-
-  <!-- <input type="text" id="userName-login" />
-      <input type="text" id="passwords" />
-      <input type="button" id="btn-login" value="Login" />
-
-      Create use!
-      <input type="text" id="userName-create" placeholder="username" />
-      <input type="text" id="userPassword-create" placeholder="password" />
-      <input type="button" value="Create account" />
-
-      <div>users</div>
-      {{#each listUsers}}
+  <div class="container">
+    <div class="columns">
+      <div class="column col-6 col-md-12">
+        <h1>Log in</h1>
         <div>
-          -
-          {{id}}:
-          <a href="/about/{{id}}">
-            {{userName}}
-            {{userPassword}}
-          </a>
+          <form action="/login" method="post">
+            <fieldset>
+              <label class="form-label" for="un">Username</label>
+              <input
+                class="form-input"
+                type="text"
+                name="un"
+                id="un"
+                required="required"
+              />
+              <br />
+              <label class="form-label" for="pw">Password</label>
+              <input
+                class="form-input"
+                type="password"
+                name="pw"
+                id="pw"
+                required="required"
+              />
+              <br />
+            </fieldset>
+            <input
+              class="btn btn-primary input-group-btn"
+              type="submit"
+              value="Login"
+            />
+          </form>
+
         </div>
-      {{/each}} -->
 
-  <div>
-    <h1>Log in</h1>
-    <div>
-      <form action="/login" method="post">
-        <fieldset>
-          <label for="un">Username: </label>
-          <input type="text" name="un" id="un" required="required" />
-          <br />
-          <label for="pw">Password: </label>
-          <input type="password" name="pw" id="pw" required="required" />
-          <br />
-        </fieldset>
-        <input type="submit" value="Login" />
-      </form>
-
+      </div>
+      <div class="column col-6 col-md-12">
+        <h1>Create Account</h1>
+        <div>
+          <form action="/login" method="post">
+            <fieldset>
+              <label class="form-label" for="un">Username</label>
+              <input
+                class="form-input"
+                type="text"
+                name="un"
+                id="un"
+                required="required"
+              />
+              <br />
+              <label class="form-label" for="pw">Password</label>
+              <input
+                class="form-input"
+                type="password"
+                name="pw"
+                id="pw"
+                required="required"
+              />
+              <br />
+            </fieldset>
+            <input
+              class="btn btn-primary input-group-btn"
+              type="submit"
+              value="Login"
+            />
+          </form>
+        </div>
+      </div>
     </div>
-
   </div>
-
 </div>

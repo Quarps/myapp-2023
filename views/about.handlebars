@@ -3,16 +3,37 @@
     {{#if isLoggedin}}
       <h1>Add projects</h1>
       <div>
-        <form action="/login" method="post">
+        <form action="/login" method="post" class="form-group">
           <fieldset>
-            <label for="un">Project name: </label>
-            <input type="text" name="un" id="un" required="required" />
+            <label class="form-label " for="pn">Project name</label>
+            <input
+              class="form-input"
+              type="text"
+              name="pn"
+              id="pn"
+              required="required"
+            />
             <br />
-            <label for="pw">Project description: </label>
-            <input type="password" name="pw" id="pw" required="required" />
+            <div class="form-group">
+              <label class="form-label " for="pd">Project description</label>
+              <textarea
+                class="form-input"
+                rows="3"
+                type="text"
+                name="pd"
+                id="pd"
+                required="required"
+              />
+              </textarea>
+            </div>
             <br />
+            <input
+              class="btn btn-primary input-group-btn"
+              type="submit"
+              value="Add"
+            />
+
           </fieldset>
-          <input type="submit" value="Add" />
         </form>
       </div>
     {{/if}}
@@ -20,12 +41,12 @@
     <div class="container">
       <div class="columns">
         {{#each listProjects}}
-          <div class="card column">
-            <a href="/about/{{id}}" class="text-center projectName">
-              {{name}}
-            </a>
-          </div>
+          <a href="/about/{{id}}" class="text-center">
 
+            <div class="card column">
+              <div class="projectName">{{name}}</div>
+            </div>
+          </a>
         {{/each}}
       </div>
     </div>
