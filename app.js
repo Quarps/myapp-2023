@@ -90,7 +90,7 @@ app.post("/login", (req, res) => {
     req.session.isAdmin = false;
     req.session.isLoggedin = false;
     req.session.name = "";
-    console.log("bad");
+    console.log("LOGIN IN ERROR");
     res.redirect("/login");
   }
 });
@@ -105,6 +105,7 @@ app.get("/login", function (req, res) {
 //-------------
 
 app.get("/", function (req, res) {
+  console.log("Session: ", req.session);
   const model = {
     isLoggedin: req.session.isLoggedin,
     isAdmin: req.session.isAdmin,
@@ -135,6 +136,202 @@ app.get("/about/:id", function (req, res) {
   res.render("project.handlebars", model);
 });
 
+//---------------
+// PROJECTS PAGE
+//---------------
+
+// renders the /projects route view
+app.get("/projects", (req, res) => {
+  db.all("SELECT * FROM project", function (error, theProjects) {
+    if (error) {
+      const model = {
+        dbError: true,
+        theError: error,
+        projects: [],
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("projects.handlebars", model);
+    } else {
+      const model = {
+        dbError: false,
+        theError: "",
+        projects: theProjects,
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("projects.handlebars", model);
+    }
+  });
+});
+
+// DELETE PROJECTS PAGE
+//----------------------
+
+app.get("/projects/delete/:id", (res, req) => {
+  const id = req.params.id;
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run(
+      "DELETE FROM project WHERE pid-?",
+      [id],
+      function (error, theProjects) {
+        if (error) {
+          const model = {
+            db: true,
+            theError: error,
+            isLoggedin: req.session.isLoggedin,
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+          };
+          res.render("home.handlebars", model); //renders the page with the model
+        } else {
+          const model = {
+            dbError: false,
+            theError: "",
+            isLoggedin: req.session.isLoggedin,
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+          };
+          res.render("home.handlebars", model); //renders the page with the model
+        }
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// ADD PROJECTS PAGE
+//----------------------
+
+// sends the form for a new project
+app.get("/projects/new", (req, res) => {
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    const model = {
+      isLoggedin: req.session.isLoggedin,
+      isAdmin: req.session.isAdmin,
+      name: req.session.name,
+    };
+    res.render("newproject.handlebars", model);
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// creates a new project
+app.post("/projects/new", (req, res) => {
+  const newp = [
+    req.body.projname,
+    req.body.projyear,
+    req.body.projdesc,
+    req.body.projtype,
+    req.body.projimg,
+  ];
+
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run(
+      "INSERT INTO project (projectName, projectDate, projectDescription, ptype, pimgURL) VALUES (?, ?, ?, ?, ?)",
+      newp,
+      (error) => {
+        if (error) {
+          console.log("ERROR: ", error);
+        } else {
+          console.log("Line added into the projects table!");
+        }
+        res.redirect("/projects");
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// UPDATE PROJECTS PAGE
+//----------------------
+
+// sends the form to modify a project
+app.get("/projects/update/:id", (req, res) => {
+  const id = req.params.id;
+  //console.log("UPDATE: ", id)
+  db.get(
+    "SELECT * FROM project WHERE pid=?",
+    [id],
+    function (error, theProject) {
+      if (error) {
+        console.log("ERROR: ", error);
+        const model = {
+          dbError: true,
+          theError: error,
+          project: {},
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        // renders the page with the model
+        res.render("modifyproject.handlebars", model);
+      } else {
+        //console.log("MODIFY: ", JSON.stringify(theProject))
+        //console.log("MODIFY: ", theProject)
+        const model = {
+          dbError: false,
+          theError: "",
+          project: theProject,
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+          helpers: {
+            theTypeR(value) {
+              return value === "Research";
+            },
+            theTypeT(value) {
+              return value == "Teaching";
+            },
+            theTypeO(value) {
+              return value == "Other";
+            },
+          },
+        };
+        // renders the page with the model
+        res.render("modifyproject.handlebars", model);
+      }
+    }
+  );
+});
+
+// modifies an existing project
+app.post("/projects/update/:id", (req, res) => {
+  const id = req.params.id; // gets the id from the dynamic parameter in the route
+  const newp = [
+    req.body.projname,
+    req.body.projyear,
+    req.body.projdesc,
+    req.body.projtype,
+    req.body.projing,
+    id,
+  ];
+
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run(
+      "UPDATE project SET projectName=?, projectDate=?, projectDescription=?, ptype=?, pimgURL=? WHERE pid=?",
+      newp,
+      (error) => {
+        if (error) {
+          console.log("ERROR: ", error);
+        } else {
+          console.log("Project updated!");
+        }
+        res.redirect("/projects");
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});
+
 //-------------
 // CONTACT PAGE
 //-------------
@@ -150,7 +347,7 @@ app.get("/contact", function (req, res) {
 });
 
 //-------------
-// ERROR PAGE
+// LOGOUT PAGE
 //-------------
 
 app.get("/logout", (req, res) => {
