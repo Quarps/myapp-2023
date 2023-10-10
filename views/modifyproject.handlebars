@@ -1,32 +1,27 @@
 
 <div id="main">
-<div>
+<div class="text-center">
 <h1>Modify project</h1> 
 <div>
 {{#if isLoggedin}}
-<form action="/projects/update/{{project.pid}}" method="post">
+<form action="/projects/update/{{project.projectID}}" method="post">
 {{#if isAdmin}}
-<fieldset>
-<label for="projname">Project name: </label>
-<input type="text" name="projname" id="projname" value="{{project.pname}}" required="required"> 
+<fieldset >
+<label class="form-label" for="projectName">Project name</label>
+<input class="form-input p-centered form-input-sm" type="text" name="projectName" id="projectName" value="{{project.projectName}}" required="required"> 
 <br />
-<label for="projyear">Project year: </label>
-<input type="number" name="projyear" id="projyear" placeholder="2023" value="{{project.pyear}}" required="required"> 
+<label  class="form-label" for="projectDate">Project year</label>
+<input class="form-input p-centered form-input-sm" type="text" name="projectDate" id="projectDate" placeholder="2023" value="{{project.projectDate}}" required="required"> 
 <br />
-<textarea name="projdesc" id="projdesc" cols="30" rows="10" required="required">{{project.pdesc}}</textarea> 
+<label class="form-label" for="projectDescription">Project description</label>
+<textarea class="form-input p-centered form-input-sm" name="projectDescription" id="projectDescription" cols="50" rows="3" required="required">{{project.projectDescription}}</textarea> 
 <br />
-<label for="projtype">Project type: </label>
-<select name="projtype" id="projtype" required="required">
-  <option value="Research" {{#if (theTypeR project.ptype)}} selected="selected"{{/if}}>Research</option> 
-  <option value="Teaching" {{#if (theTypeT project.ptype)}} selected="selected"{{/if}}>Teaching</option> 
-  <option value="Other" {{#if (theTypeO project.ptype)}} selected="selected"{{/if}}>Other</option>
-</select>
-<br />
-<label for="projimg">Project image URL: </label>
-<Input type="text" name="projimg" id="projimg" placeholder="/img/" value="{{project.pingURL}}" required="required">
-<br />
+
+<label class="form-label" for="projectImage">Project image URL</label>
+<input class="form-input p-centered form-input-sm" type="text" name="projectImage" id="projectImage" placeholder="../img/" value="{{project.projectImage}}" required="required">
+
 </fieldset>
-<input type="submit" value="Add project">
+<input  class="btn btn-primary input-group-btn" type="submit" value="Modify project">
 </form>
 {{else}}
 <p>Sorry, you must be an administrator to add a new project!</p>

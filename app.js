@@ -172,16 +172,16 @@ app.get("/projects", (req, res) => {
 // DELETE PROJECTS PAGE
 //----------------------
 
-app.get("/projects/delete/:id", (res, req) => {
+app.get("/projects/delete/:id", (req, res) => {
   const id = req.params.id;
   if (req.session.isLoggedin === true && req.session.isAdmin === true) {
     db.run(
-      "DELETE FROM project WHERE pid-?",
+      "DELETE FROM project WHERE projectID=?",
       [id],
       function (error, theProjects) {
         if (error) {
           const model = {
-            db: true,
+            dbError: true,
             theError: error,
             isLoggedin: req.session.isLoggedin,
             isAdmin: req.session.isAdmin,
@@ -225,16 +225,15 @@ app.get("/projects/new", (req, res) => {
 // creates a new project
 app.post("/projects/new", (req, res) => {
   const newp = [
-    req.body.projname,
-    req.body.projyear,
-    req.body.projdesc,
-    req.body.projtype,
-    req.body.projimg,
+    req.body.projectName,
+    req.body.projectDate,
+    req.body.projectDescription,
+    req.body.projectImage,
   ];
 
   if (req.session.isLoggedin === true && req.session.isAdmin === true) {
     db.run(
-      "INSERT INTO project (projectName, projectDate, projectDescription, ptype, pimgURL) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO project (projectName, projectDate, projectDescription, projectImage) VALUES (?, ?, ?, ?)",
       newp,
       (error) => {
         if (error) {
@@ -258,7 +257,7 @@ app.get("/projects/update/:id", (req, res) => {
   const id = req.params.id;
   //console.log("UPDATE: ", id)
   db.get(
-    "SELECT * FROM project WHERE pid=?",
+    "SELECT * FROM project WHERE projectID=?",
     [id],
     function (error, theProject) {
       if (error) {
@@ -283,17 +282,6 @@ app.get("/projects/update/:id", (req, res) => {
           isLoggedin: req.session.isLoggedin,
           isAdmin: req.session.isAdmin,
           name: req.session.name,
-          helpers: {
-            theTypeR(value) {
-              return value === "Research";
-            },
-            theTypeT(value) {
-              return value == "Teaching";
-            },
-            theTypeO(value) {
-              return value == "Other";
-            },
-          },
         };
         // renders the page with the model
         res.render("modifyproject.handlebars", model);
@@ -306,17 +294,16 @@ app.get("/projects/update/:id", (req, res) => {
 app.post("/projects/update/:id", (req, res) => {
   const id = req.params.id; // gets the id from the dynamic parameter in the route
   const newp = [
-    req.body.projname,
-    req.body.projyear,
-    req.body.projdesc,
-    req.body.projtype,
-    req.body.projing,
+    req.body.projectName,
+    req.body.projectDate,
+    req.body.projectDescription,
+    req.body.projectImage,
     id,
   ];
 
   if (req.session.isLoggedin === true && req.session.isAdmin === true) {
     db.run(
-      "UPDATE project SET projectName=?, projectDate=?, projectDescription=?, ptype=?, pimgURL=? WHERE pid=?",
+      "UPDATE project SET projectName=?, projectDate=?, projectDescription=?, projectImage=? WHERE projectID=?",
       newp,
       (error) => {
         if (error) {

@@ -1,56 +1,59 @@
 <div id="main">
-  <div>
+  <div class="text-center">
     <h1>New project</h1>
     <div>
       {{#if isLoggedin}}
         {{#if isAdmin}}
           <form action="/projects/new" method="post">
             <fieldset>
-              <label for="projname">Project name: </label>
+              <label class="form-label" for="projectName">Project name</label>
               <input
+                class="form-input p-centered form-input-sm"
                 type="text"
-                name="projname"
-                id="projname"
+                name="projectName"
+                id="projectName"
                 required="required"
               />
               <br />
-              <label for="projyear">Project year: </label>
+              <label class="form-label" for="projectDate">Project date</label>
               <input
-                type="number"
-                name="projyear"
-                id="projyear"
-                placeholder="2023"
+                class="form-input p-centered form-input-sm"
+                type="text"
+                name="projectDate"
+                id="projectDate"
+                placeholder="year"
+                value="20"
                 required="required"
               />
               <br />
+              <label class="form-label" for="projectDescription">Project
+                description
+              </label>
               <textarea
-                name="projdesc"
-                id="projdesc"
-                cols="30"
-                rows="10"
+                class="form-input p-centered form-input-sm"
+                name="projectDescription"
+                id="projectDescription"
+                cols="50"
+                rows="3"
                 required="required"
               ></textarea>
               <br />
-              <label for="projtype">Project type: </label>
-              <select name="projtype" id="projtype" required="required">
-
-                <option value="Research">Research</option>
-                <option value="Education">Education</option>
-                <option value="Other">Other</option>
-
-              </select>
-              <br />
-              <label for="projimg">Project image URL: </label>
+              <label class="form-label" for="projectImage">Project image URL
+              </label>
               <input
+                class="form-input p-centered form-input-sm"
                 type="text"
-                name="projing"
-                id="projimg"
-                placeholder="/img/"
+                name="projectImage"
+                id="projectImage"
+                placeholder="../img/"
                 required="required"
               />
-              <br />
             </fieldset>
-            <input type="submit" value="Add project" />
+            <input
+              class="btn btn-primary input-group-btn"
+              type="submit"
+              value="Add project"
+            />
           </form>
         {{else}}
           <p>Sorry, you must be an administrator to add a new project!</p>

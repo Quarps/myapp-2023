@@ -1,13 +1,16 @@
-<div id="main">
+<div id="main main-home">
   <div>
-    <h1>Welcome</h1>
-    <div>
-      Welcome on this site!
-      {{#if isLoggedin}}
-        <div>Hi,
-          {{name}}
+    <div class="img-home">
+      <div class="intro-text-home text-center">
+
+        <div class="text-home">
+          Welcome
+          {{#if isLoggedin}}
+            {{name}}
+          {{/if}}
         </div>
-      {{/if}}
+      </div>
     </div>
+    <div class="content-home"></div>
   </div>
 </div>

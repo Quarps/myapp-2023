@@ -4,8 +4,15 @@
     <!--p>dbError: {{dbError}}, 1sAdmin: {{isAdmin}}, name: {{name}}, is LoggedIn: {{1sLoggedIn}}</p-->
     {{#if isAdmin}}
       <div>
-        <a href="/projects/new" class="btn btn-link"> New project </a>
+        <a
+          href="/projects/new"
+          class="btn btn-primary input-group-btn"
+          type="submit"
+        >
+          Add project
+        </a>
       </div>
+      <br>
     {{/if}}
     <div class="columns">
       {{#if dbError}}
@@ -15,32 +22,32 @@
         </div>
       {{else}}
         {{#each projects}}
-          <div class="column col-4 col-md-6 col-sm-12">
-            <div class="card">
-              <div class="card-image">
-                <img
-                  src="{{pingURL}}"
-                  alt="{{pingURL}}"
-                  class="img-responsive"
-                />
-              </div>
-              <div class="card-header">
-                <div class="card-title h3">{{projectName}}</div>
-                <div class="card subtitle text white">{{pyear}} {{ptype}}</div>
-              </div>
-              <div class="card-footer">
-                {{#if isAdmin}}
-                  <div>
-                    <a href="/projects/update/{{pid}}"> Modify </a>
-                    -
-                    <a href="/projects/delete/{{pid}}" class="important">
-                      Delete
-                    </a>
-                  </div>
-                {{/if}}
-              </div>
+        <a href="/project/{{project.projectID}}">
+          <div class="column col-3 card">
+            <div class="card-image">
+            <img
+              src="{{projectImage}}"
+              alt="{{projectImage}}"
+              class="img-responsive"
+            />
+            </div>
+            <div class="card-header">
+              <div class="card-title h5 ">{{projectName}}</div>
+              <div class="card-subtitle text-gray">{{projectDate}}</div>
+            </div>
+            <div class="card-footer">
+              {{#if ../isAdmin}}
+                <div>
+                  <a href="/projects/update/{{projectID}}" class="btn btn-primary"> Modify </a>
+                  
+                  <a  href="/projects/delete/{{projectID}}" class="btn btn-primary important">
+                    Delete
+                  </a>
+                </div>
+              {{/if}}
             </div>
           </div>
+          </a>
         {{/each}}
       {{/if}}
     </div>
