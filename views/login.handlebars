@@ -6,11 +6,21 @@
         <div>
           <form action="/login" method="post">
             <fieldset>
-              <label class="form-label" for="un">Username</label>
-              <input class="form-input" type="text" name="un" id="un" />
+              <label class="form-label" for="userName">Username</label>
+              <input
+                class="form-input"
+                type="text"
+                name="userName"
+                id="userName"
+              />
               <br />
-              <label class="form-label" for="pw">Password</label>
-              <input class="form-input" type="password" name="pw" id="pw" />
+              <label class="form-label" for="userPassword">Password</label>
+              <input
+                class="form-input"
+                type="password"
+                name="userPassword"
+                id="userPassword"
+              />
               <br />
             </fieldset>
             <input
@@ -19,26 +29,66 @@
               value="Login"
             />
           </form>
-
         </div>
-
       </div>
+      <br />
       <div class="column col-6 col-md-12">
         <h1>Create Account</h1>
         <div>
-          <form action="/login" method="post">
+          <form action="/create-account" method="post">
             <fieldset>
-              <label class="form-label" for="un">Username</label>
-              <input class="form-input" type="text" name="un" id="un" />
-              <br />
-              <label class="form-label" for="pw">Password</label>
-              <input class="form-input" type="password" name="pw" id="pw" />
+              <div class="">
+                <label class="form-label" for="firstName">First name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  name="firstName"
+                  id="firstName"
+                />
+                <br />
+                <label class="form-label" for="lastName">Last name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  name="lastName"
+                  id="lastName"
+                />
+                <br />
+              </div>
+              <div class="">
+                <label class="form-label" for="createUserName">Username</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  name="createUserName"
+                  id="createUserName"
+                />
+                <br />
+                <label
+                  class="form-label"
+                  for="createUserPassword"
+                >Password</label>
+                <input
+                  class="form-input"
+                  type="password"
+                  name="createUserPassword"
+                  id="createUserPassword"
+                />
+                <br />
+              </div>
+              <label class="form-label" for="userEmail">Email</label>
+              <input
+                class="form-input"
+                type="text"
+                name="userEmail"
+                id="userEmail"
+              />
               <br />
             </fieldset>
             <input
               class="btn btn-primary input-group-btn"
               type="submit"
-              value="Login"
+              value="Create Account"
             />
           </form>
         </div>

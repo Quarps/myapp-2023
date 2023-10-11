@@ -4,7 +4,14 @@
   font-family: sans-serif;
   box-sizing: content-box;
 }
-
+h1,
+.form-label {
+  color: white;
+}
+html,
+body {
+  background-color: rgb(20, 20, 20);
+}
 #main {
   width: 90%;
   margin: 0 auto;
@@ -62,14 +69,20 @@ a:link {
 }
 
 .content-home {
+  padding: 1rem 0rem 1rem 0rem;
   width: 100%;
   background-color: rgb(20, 20, 20);
-  height: 30vh;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 .footer-home {
   width: 100%;
   background-color: rgb(10, 10, 10);
   height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 /* ----------------- */
 /* PROJECT PAGE */
@@ -86,12 +99,14 @@ a:link {
   overflow: hidden;
 }
 .card {
-  background-color: rgb(24, 24, 24);
+  background-color: rgb(39, 39, 39);
   border-radius: 0.5rem;
   height: 290px;
   width: 300px;
   margin-top: 2rem;
+  border: none;
 }
+
 .btn {
   height: 0rem;
   padding: 0.75rem 1rem;

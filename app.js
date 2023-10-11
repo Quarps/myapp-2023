@@ -76,28 +76,84 @@ app.use(
 // LOGIN PAGE
 //-------------
 
+// LOGIN
+//----------------------
 app.post("/login", (req, res) => {
-  const un = req.body.un;
-  const pw = req.body.pw;
+  const userName = req.body.userName;
+  const userPassword = req.body.userPassword;
 
-  if (un === "12" && pw === "32") {
-    req.session.isAdmin = true;
-    req.session.isLoggedin = true;
-    req.session.name = "Ludwig";
-    console.log(req.session.isLoggedin);
-    res.redirect("/");
-  } else {
-    req.session.isAdmin = false;
-    req.session.isLoggedin = false;
-    req.session.name = "";
-    console.log("LOGIN IN ERROR");
-    res.redirect("/login");
-  }
+  console.log("Username from request:", userName);
+  console.log("Password from request:", userPassword);
+
+  db.get(
+    "SELECT * FROM user WHERE createUserName = ?",
+    userName,
+    (err, row) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+      } else if (row) {
+        // User found in the database, check the password
+        if (row.createUserPassword === userPassword) {
+          // Passwords match, set session variables and redirect to the home page
+          if (row.userRole === "admin") {
+            req.session.isAdmin = true;
+          }
+          req.session.isLoggedin = true;
+          req.session.name = row.firstName; // Use the user's name from the database
+          res.redirect("/");
+        } else {
+          // Password doesn't match
+          req.session.isAdmin = false;
+          req.session.isLoggedin = false;
+          req.session.name = "";
+          console.log("Incorrect password");
+          res.redirect("/login");
+        }
+      } else {
+        // User not found in the database
+        req.session.isAdmin = false;
+        req.session.isLoggedin = false;
+        req.session.name = "";
+        console.log("User not found");
+        res.redirect("/login");
+      }
+    }
+  );
 });
-// defines route "/login"
+
+// DEFINES THE ROUTE
+//----------------------
 app.get("/login", function (req, res) {
   const model = {};
   res.render("login.handlebars", model);
+});
+
+// CREATE USER
+//----------------------
+
+app.post("/create-account", (req, res) => {
+  const newUser = [
+    req.body.createUserName,
+    req.body.createUserPassword,
+    req.body.firstName,
+    req.body.lastName,
+    req.body.userEmail,
+    "user",
+  ];
+  db.run(
+    "INSERT INTO user (createUserName, createUserPassword, firstName, lastName, userEmail, userRole) VALUES (?, ?, ?, ?, ?, ?)",
+    newUser,
+
+    (error) => {
+      if (error) {
+        console.log("ERROR: ", error);
+      } else {
+        console.log("ACCOUNT CREATED");
+      }
+      res.redirect("/");
+    }
+  );
 });
 
 //-------------
@@ -106,12 +162,34 @@ app.get("/login", function (req, res) {
 
 app.get("/", function (req, res) {
   console.log("Session: ", req.session);
-  const model = {
-    isLoggedin: req.session.isLoggedin,
-    isAdmin: req.session.isAdmin,
-    name: req.session.name,
-  };
-  res.render("home.handlebars", model);
+  db.all(
+    "SELECT * FROM project WHERE projectID IN (SELECT projectID FROM project ORDER BY RANDOM() LIMIT 3) ORDER BY RANDOM()",
+    function (error, theProjects) {
+      if (error) {
+        const model = {
+          dbError: true,
+          theError: error,
+          projects: [],
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        // renders the page with the model
+        res.render("projects.handlebars", model);
+      } else {
+        const model = {
+          dbError: false,
+          theError: "",
+          projects: theProjects,
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        // renders the page with the model
+        res.render("home.handlebars", model);
+      }
+    }
+  );
 });
 
 //-------------
@@ -331,6 +409,139 @@ app.get("/contact", function (req, res) {
     name: req.session.name,
   };
   res.render("contact.handlebars", model);
+});
+
+//-------------
+// USERS PAGE
+//-------------
+
+// RENDERS USER PAGE
+//---------------------
+app.get("/users", (req, res) => {
+  db.all("SELECT * FROM user", function (error, theUsers) {
+    if (error) {
+      const model = {
+        dbError: true,
+        theError: error,
+        users: [],
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("users.handlebars", model);
+    } else {
+      const model = {
+        dbError: false,
+        theError: "",
+        users: theUsers,
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("users.handlebars", model);
+    }
+  });
+});
+
+// DELETE USERS
+//---------------------
+app.get("/users/delete/:id", (req, res) => {
+  const id = req.params.id;
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run("DELETE FROM user WHERE userID=?", [id], function (error, theUsers) {
+      if (error) {
+        const model = {
+          dbError: true,
+          theError: error,
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        res.render("home.handlebars", model);
+        //renders the page with the model
+      } else {
+        const model = {
+          dbError: false,
+          theError: "",
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        res.render("home.handlebars", model); //renders the page with the model
+      }
+    });
+  } else {
+    res.redirect("/users");
+  }
+});
+
+// MODIFY USERS
+//---------------------
+
+app.get("/users/update/:id", (req, res) => {
+  const id = req.params.id;
+  //console.log("UPDATE: ", id)
+  db.get("SELECT * FROM user WHERE userID=?", [id], function (error, theUser) {
+    if (error) {
+      console.log("ERROR: ", error);
+      const model = {
+        dbError: true,
+        theError: error,
+        user: {},
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("modifyusers.handlebars", model);
+    } else {
+      //console.log("MODIFY: ", JSON.stringify(theProject))
+      //console.log("MODIFY: ", theProject)
+      const model = {
+        dbError: false,
+        theError: "",
+        user: theUser,
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("modifyusers.handlebars", model);
+    }
+  });
+});
+
+// modifies an existing project
+app.post("/users/update/:id", (req, res) => {
+  const id = req.params.id; // gets the id from the dynamic parameter in the route
+  const newUsers = [
+    req.body.createUserName,
+    req.body.createUserPassword,
+    req.body.firstName,
+    req.body.lastName,
+    req.body.userEmail,
+    req.body.userRole,
+    id,
+  ];
+
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run(
+      "UPDATE user SET createUserName=?, createUserPassword=?, firstName=?, lastName=? , userEmail=?, userRole=? WHERE userID=?",
+      newUsers,
+      (error) => {
+        if (error) {
+          console.log("ERROR: ", error);
+        } else {
+          console.log("User updated!");
+        }
+        res.redirect("/users");
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
 });
 
 //-------------

@@ -1,0 +1,48 @@
+
+<div id="main">
+<div class="text-center">
+<h1>Modify user</h1> 
+<div>
+{{#if isLoggedin}}
+<form action="/users/update/{{user.userID}}" method="post">
+{{#if isAdmin}}
+<fieldset >
+<label class="form-label" for="createUserName">Username</label>
+<input class="form-input p-centered form-input-sm" type="text" name="createUserName" id="createUserName" value="{{user.createUserName}}" required="required"> 
+<br />
+<label  class="form-label" for="createUserPassword">Password</label>
+<input class="form-input p-centered form-input-sm" type="password" name="createUserPassword" id="createUserPassword" placeholder="" value="{{user.createUserPassword}}" required="required"> 
+<br />
+<label class="form-label" for="firstName">First name</label>
+<input class="form-input p-centered form-input-sm" type="text" name="firstName" id="firstName" placeholder="" value="{{user.firstName}}" required="required"> 
+<br />
+<label class="form-label" for="lastName">Last name</label>
+<input class="form-input p-centered form-input-sm" type="text" name="lastName" id="lastName" placeholder="" value="{{user.lastName}}" required="required">
+<br />
+<label class="form-label" for="userEmail">Email</label>
+<input class="form-input p-centered form-input-sm" type="text" name="userEmail" id="userEmail" placeholder="" value="{{user.userEmail}}" required="required"> 
+<br />
+<label class="form-label" for="userRole">Role</label>
+<select class="form-input p-centered form-input-sm" name="userRole" id="userRole" required="required">
+  <option value="user">user</option>
+  <option value="admin">admin</option>
+</select>
+<br />
+
+<br />
+</fieldset>
+<input  class="btn btn-primary input-group-btn" type="submit" value="Modify user">
+</form>
+{{else}}
+<p>Sorry, you must be an administrator to add a new project!</p>
+{{/if}}
+{{else}}
+<p>
+  Sorry, you must be logged in to add a new project!<br /> 
+  Please go to the 
+  <a href="/login">login</a> page.
+</p>
+{{/if}}
+</div>
+</div>
+</div>

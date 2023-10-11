@@ -11,6 +11,29 @@
         </div>
       </div>
     </div>
-    <div class="content-home"></div>
+    <div class="content-home container">
+      <div class="columns">
+        {{#each projects}}
+          <a href="/project/{{project.projectID}}">
+            <div class="column col-3 card">
+              <div class="card-image">
+                <img
+                  src="{{projectImage}}"
+                  alt="{{projectImage}}"
+                  class="img-responsive"
+                />
+              </div>
+              <div class="card-header">
+                <div class="card-title h5">{{projectName}}</div>
+                <div class="card-subtitle text-gray">{{projectDate}}</div>
+              </div>
+            </div>
+          </a>
+        {{/each}}
+      </div>
+    </div>
+    <footer class="footer-home">
+      © 2023
+    </footer>
   </div>
 </div>

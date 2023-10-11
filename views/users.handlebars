@@ -1,0 +1,49 @@
+<div id="main">
+  <div class="container">
+    <h1>Users</h1>
+    <!--p>dbError: {{dbError}}, 1sAdmin: {{isAdmin}}, name: {{name}}, is LoggedIn: {{1sLoggedIn}}</p-->
+    <div class="columns">
+      {{#if dbError}}
+        <div>
+          Sorry, there was a problem with the database:<br />
+          {{theError}}
+        </div>
+      {{else}}
+        {{#each users}}
+          <div class="column col-3 card text-center">
+            <div class="card-image">
+              <img
+                src="https://videogames.si.com/.image/ar_1.91%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cg_faces:center%2Cq_auto:good%2Cw_1200/MjAwMzI2MDAzMTMyNzM2NjIw/fortnite-khaby-lame.jpg"
+                alt="{{projectImage}}"
+                class="img-responsive"
+              />
+            </div>
+            <div class="card-header">
+              <div class="card-title h5 text-light">{{createUserName}}</div>
+              <div class="card-subtitle text-primary">{{userRole}}
+              </div>
+              <div class="card-subtitle text-gray">{{firstName}}
+                {{lastName}}</div>
+            </div>
+            <div class="card-footer">
+
+              <div>
+                <a href="/users/update/{{userID}}" class="btn btn-primary">
+                  Modify
+                </a>
+
+                <a
+                  href="/users/delete/{{userID}}"
+                  class="btn btn-primary important"
+                >
+                  Delete
+                </a>
+              </div>
+
+            </div>
+          </div>
+        {{/each}}
+      {{/if}}
+    </div>
+  </div>
+</div>
