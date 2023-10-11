@@ -11,11 +11,17 @@ const notifier = require("node-notifier");
 const bcrypt = require("bcrypt");
 //const cookieParser = require("cookie-parser");
 
+// PORT & EXPRESS
+//-----------------
 const port = 8050; // defines the port
 const app = express(); // creates the Express application
 
+// CONNECTION OF THE DATA BASE
+//----------------------------
 const db = new sqlite3.Database("Web development Portfolio.db");
 
+// VIEW ENGINE
+//--------------
 // defines handlebars engine
 app.engine("handlebars", engine());
 // defines the view engine to be handlebars
@@ -23,25 +29,10 @@ app.set("view engine", "handlebars");
 // defines the views directory
 app.set("views", "./views");
 
+// EXPRESS STATIC
+//-----------------
 // define static directory "public" to access css/ and img/
 app.use(express.static("public"));
-
-// MODEL (DATA)
-const projects = [
-  { id: "0", name: "Jerome" },
-  { id: "1", name: "Mira" },
-  { id: "2", name: "Linus" },
-  { id: "3", name: "Susanne" },
-  { id: "4", name: "Jasmin" },
-];
-
-const users = [
-  {
-    id: "0",
-    userName: "loka",
-    userPassword: "admin",
-  },
-];
 
 //-------------
 // MIDDLEWARES
@@ -240,7 +231,6 @@ app.get("/", function (req, res) {
 // defines route "/about"
 app.get("/about", function (req, res) {
   const model = {
-    listProjects: projects,
     isLoggedin: req.session.isLoggedin,
     isAdmin: req.session.isAdmin,
     name: req.session.name,
@@ -248,10 +238,11 @@ app.get("/about", function (req, res) {
 
   res.render("about.handlebars", model);
 });
+
 //define route "/about/id"
 app.get("/about/:id", function (req, res) {
   const id = req.params.id;
-  const model = projects[id];
+  const model = {};
   res.render("project.handlebars", model);
 });
 
@@ -259,7 +250,8 @@ app.get("/about/:id", function (req, res) {
 // PROJECTS PAGE
 //---------------
 
-// renders the /projects route view
+// RENDER THE PROJECTS PAGE
+//--------------------------
 app.get("/projects", (req, res) => {
   db.all("SELECT * FROM project", function (error, theProjects) {
     if (error) {
