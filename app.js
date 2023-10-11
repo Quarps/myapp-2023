@@ -7,6 +7,7 @@ const sqlite3 = require("sqlite3");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const connectSqlite3 = require("connect-sqlite3");
+//const bcrypt = require('bcrypt')
 //const cookieParser = require("cookie-parser");
 
 const port = 8050; // defines the port
