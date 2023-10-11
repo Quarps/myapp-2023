@@ -607,7 +607,7 @@ app.get("/logout", (req, res) => {
   console.log("Logged out");
   res.redirect("/");
   notifier.notify({
-    title: "Hello sir",
+    title: "Hello sir,",
     message: "You have been hacked, LOL",
   });
 });
