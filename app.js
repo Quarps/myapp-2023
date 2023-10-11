@@ -7,7 +7,8 @@ const sqlite3 = require("sqlite3");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const connectSqlite3 = require("connect-sqlite3");
-//const bcrypt = require('bcrypt')
+const notifier = require("node-notifier");
+const bcrypt = require("bcrypt");
 //const cookieParser = require("cookie-parser");
 
 const port = 8050; // defines the port
@@ -79,6 +80,7 @@ app.use(
 
 // LOGIN
 //----------------------
+
 app.post("/login", (req, res) => {
   const userName = req.body.userName;
   const userPassword = req.body.userPassword;
@@ -92,25 +94,30 @@ app.post("/login", (req, res) => {
     (err, row) => {
       if (err) {
         console.error(err);
-        res.status(500).send("Internal Server Error");
       } else if (row) {
-        // User found in the database, check the password
-        if (row.createUserPassword === userPassword) {
-          // Passwords match, set session variables and redirect to the home page
-          if (row.userRole === "admin") {
-            req.session.isAdmin = true;
+        // User found in the database, compare the hashed password
+        bcrypt.compare(
+          userPassword,
+          row.createUserPassword,
+          function (err, result) {
+            if (result === true) {
+              // Passwords match, set session variables and redirect to the home page
+              if (row.userRole === "admin") {
+                req.session.isAdmin = true;
+              }
+              req.session.isLoggedin = true;
+              req.session.name = row.firstName; // Use the user's name from the database
+              res.redirect("/");
+            } else {
+              // Password doesn't match
+              req.session.isAdmin = false;
+              req.session.isLoggedin = false;
+              req.session.name = "";
+              console.log("Incorrect password");
+              res.redirect("/login");
+            }
           }
-          req.session.isLoggedin = true;
-          req.session.name = row.firstName; // Use the user's name from the database
-          res.redirect("/");
-        } else {
-          // Password doesn't match
-          req.session.isAdmin = false;
-          req.session.isLoggedin = false;
-          req.session.name = "";
-          console.log("Incorrect password");
-          res.redirect("/login");
-        }
+        );
       } else {
         // User not found in the database
         req.session.isAdmin = false;
@@ -133,26 +140,59 @@ app.get("/login", function (req, res) {
 // CREATE USER
 //----------------------
 
+const saltRounds = 10; // You can adjust the number of salt rounds as needed
+
 app.post("/create-account", (req, res) => {
+  const newUsername = req.body.createUserName;
   const newUser = [
-    req.body.createUserName,
-    req.body.createUserPassword,
+    newUsername,
     req.body.firstName,
     req.body.lastName,
     req.body.userEmail,
     "user",
   ];
-  db.run(
-    "INSERT INTO user (createUserName, createUserPassword, firstName, lastName, userEmail, userRole) VALUES (?, ?, ?, ?, ?, ?)",
-    newUser,
 
-    (error) => {
-      if (error) {
-        console.log("ERROR: ", error);
+  // Check if the username already exists in the database
+  db.get(
+    "SELECT * FROM user WHERE createUserName = ?",
+    newUsername,
+    (err, row) => {
+      if (err) {
+        console.error(err);
+      } else if (row) {
+        // Username already exists, handle the error (e.g., send a response)
+        console.log("Username already exists");
       } else {
-        console.log("ACCOUNT CREATED");
+        // Username is unique; proceed with hashing the password and user creation
+        bcrypt.hash(
+          req.body.createUserPassword,
+          saltRounds,
+          function (err, hash) {
+            if (err) {
+              console.log("Error", err);
+            } else {
+              console.log("Hashed password", hash);
+
+              // Now that you have the hashed password, you can insert it into the database
+              newUser.splice(1, 0, hash); // Insert the hashed password at index 1
+
+              db.run(
+                "INSERT INTO user (createUserName, createUserPassword, firstName, lastName, userEmail, userRole) VALUES (?, ?, ?, ?, ?, ?)",
+                newUser,
+                (error) => {
+                  if (error) {
+                    console.log("ERROR: ", error);
+                    res.status(500).send("Account creation failed");
+                  } else {
+                    console.log("ACCOUNT CREATED");
+                    res.redirect("/"); // Redirect the user after the account is created
+                  }
+                }
+              );
+            }
+          }
+        );
       }
-      res.redirect("/");
     }
   );
 });
@@ -516,10 +556,10 @@ app.get("/users/update/:id", (req, res) => {
 
 // modifies an existing project
 app.post("/users/update/:id", (req, res) => {
-  const id = req.params.id; // gets the id from the dynamic parameter in the route
+  const id = req.params.id; // gets the ID from the dynamic parameter in the route
   const newUsers = [
     req.body.createUserName,
-    req.body.createUserPassword,
+    req.body.createUserPassword, // The new plain text password
     req.body.firstName,
     req.body.lastName,
     req.body.userEmail,
@@ -528,18 +568,29 @@ app.post("/users/update/:id", (req, res) => {
   ];
 
   if (req.session.isLoggedin === true && req.session.isAdmin === true) {
-    db.run(
-      "UPDATE user SET createUserName=?, createUserPassword=?, firstName=?, lastName=? , userEmail=?, userRole=? WHERE userID=?",
-      newUsers,
-      (error) => {
-        if (error) {
-          console.log("ERROR: ", error);
-        } else {
-          console.log("User updated!");
-        }
-        res.redirect("/users");
+    // Hash the new password
+    bcrypt.hash(req.body.createUserPassword, saltRounds, function (err, hash) {
+      if (err) {
+        console.log("Error", err);
+      } else {
+        console.log("Hashed password", hash);
+        newUsers[1] = hash; // Update the array with the hashed password
+
+        // Now, update the user record in the database with the new hashed password
+        db.run(
+          "UPDATE user SET createUserName=?, createUserPassword=?, firstName=?, lastName=?, userEmail=?, userRole=? WHERE userID=?",
+          newUsers,
+          (error) => {
+            if (error) {
+              console.log("ERROR: ", error);
+            } else {
+              console.log("User updated!");
+            }
+            res.redirect("/users");
+          }
+        );
       }
-    );
+    });
   } else {
     res.redirect("/login");
   }
@@ -555,6 +606,10 @@ app.get("/logout", (req, res) => {
   });
   console.log("Logged out");
   res.redirect("/");
+  notifier.notify({
+    title: "Hello sir",
+    message: "You have been hacked, LOL",
+  });
 });
 //-------------
 // ERROR PAGE
