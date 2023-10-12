@@ -1,9 +1,12 @@
 <div id="main">
   <div>
     <h1>Contact</h1>
-    <img src="../public/img/mountain.jpg" alt="sad" />
-    <div>
-      Ludwig Anderzen
+    <div>{{#each contactInformation}}
+        {{phone}}
+        {{email}}
+        <a href="{{linkedin}}">Linkedin</a>
+        <a href="{{instagram}}">Instagram</a>
+      {{/each}}
     </div>
     <div>
 

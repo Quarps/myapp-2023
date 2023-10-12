@@ -436,12 +436,31 @@ app.post("/projects/update/:id", (req, res) => {
 
 // defines route "/contact"
 app.get("/contact", function (req, res) {
-  const model = {
-    isLoggedin: req.session.isLoggedin,
-    isAdmin: req.session.isAdmin,
-    name: req.session.name,
-  };
-  res.render("contact.handlebars", model);
+  db.all("SELECT * FROM contactInformation", function (error, theContact) {
+    if (error) {
+      const model = {
+        dbError: true,
+        theError: error,
+        contactInformation: [],
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("contact.handlebars", model);
+    } else {
+      const model = {
+        dbError: false,
+        theError: "",
+        contactInformation: theContact,
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("contact.handlebars", model);
+    }
+  });
 });
 
 //-------------
