@@ -430,6 +430,36 @@ app.post("/projects/update/:id", (req, res) => {
   }
 });
 
+// PRODUCT OWN PAGE
+//----------------------
+app.get("/projects/:id", function (req, res) {
+  db.all("SELECT * FROM project", function (error, theProjects) {
+    if (error) {
+      const model = {
+        dbError: true,
+        theError: error,
+        projects: [],
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("project.handlebars", model);
+    } else {
+      const model = {
+        dbError: false,
+        theError: "",
+        projects: theProjects,
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+      };
+      // renders the page with the model
+      res.render("project.handlebars", model);
+    }
+  });
+});
+
 //-------------
 // CONTACT PAGE
 //-------------
@@ -469,6 +499,7 @@ app.get("/contact", function (req, res) {
 
 // RENDERS USER PAGE
 //---------------------
+
 app.get("/users", (req, res) => {
   db.all("SELECT * FROM user", function (error, theUsers) {
     if (error) {

@@ -126,3 +126,12 @@ a:link {
   width: 80%;
   max-width: 500px;
 }
+
+.contact-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.contact-div {
+  padding: 0rem 10rem 3rem 0rem;
+}

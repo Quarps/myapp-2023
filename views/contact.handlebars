@@ -1,11 +1,18 @@
 <div id="main">
   <div>
     <h1>Contact</h1>
-    <div>{{#each contactInformation}}
-        {{phone}}
-        {{email}}
-        <a href="{{linkedin}}">Linkedin</a>
-        <a href="{{instagram}}">Instagram</a>
+    <div class="contact-list">{{#each contactInformation}}
+        <div class="contact-div">
+          <h3 class="text-light">Information</h3>
+          <div class="text-light">{{phone}}</div>
+          <div class="text-light">{{email}}</div>
+        </div>
+        <br />
+        <div class="contact-div">
+          <h3 class="text-light">Social media</h3>
+          <div class="text-light"><a href="{{linkedin}}">Linkedin</a></div>
+          <div class="text-light"><a href="{{instagram}}">Instagram</a></div>
+        </div>
       {{/each}}
     </div>
     <div>
