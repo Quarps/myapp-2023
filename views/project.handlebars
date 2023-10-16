@@ -21,12 +21,11 @@
         <h5 class="text-italic text-primary">{{userName}}</h5>
         <br />
         <div>{{commentBody}}</div>
-     {{#if ../isAdmin}}
-  <form action="/delete-comment/{{commentID}}" method="post">
-    <input type="submit" name="deleteComment" value="Delete">
-  </form>
-{{/if}}
-
+        <!-- {{#if ../isAdmin}}
+        <form action="/delete-comment/{{commentID}}" method="post">
+          <input type="submit" name="deleteComment" value="Delete">
+        </form>
+       {{/if}} -->
       </div>
     {{/each}}
 
@@ -38,7 +37,6 @@
         <input
           class="commentHead form-input"
           type="text"
-          placeholder="commentHead"
           id="commentHead"
           name="commentHead"
           required="required"
@@ -48,7 +46,6 @@
           name="commentBody"
           class="commentBody form-input"
           type="text"
-          placeholder="commentBody"
           id="commentBody"
           required="required"
         />
