@@ -1,17 +1,20 @@
 <header id="menu" class="navbar">
-  <section class="navbar-section">
-    <!-- logo -->
-  </section>
-
-  <section class="navbar-center">
-    <a href="/" class="btn btn-link"> Home </a>
-    <a href="/about" class="btn btn-link"> About </a>
-    <a href="/projects" class="btn btn-link"> Projects </a>
-    <a href="/contact" class="btn btn-link"> Contact </a>
-    {{#if isAdmin}}
-      <a href="/users" class="btn btn-link"> Users </a>
-    {{/if}}
-  </section>
+  <div class="dropdown">
+    <div class="btn-group">
+      <a href="#" class="btn dropdown-toggle btn-primary" tabindex="0">
+        Menu
+      </a>
+      <ul class="menu btn-primary">
+        <div><a href="/" class="btn btn-link dropdown-toggle"> Home </a></div>
+        <a href="/about" class="btn btn-link"> About </a>
+        <a href="/projects/1" class="btn btn-link"> Projects </a>
+        <a href="/contact" class="btn btn-link"> Contact </a>
+        {{#if isAdmin}}
+          <a href="/users" class="btn btn-link"> Users </a>
+        {{/if}}
+      </ul>
+    </div>
+  </div>
   <section class="navbar-section">
     {{#if isLoggedin}}
       <div>Hi,

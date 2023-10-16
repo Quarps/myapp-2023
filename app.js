@@ -3,6 +3,7 @@
 //--------------
 const express = require("express"); // loads the express package
 const { engine } = require("express-handlebars"); // loads handlebars for Express
+const handlebars = require("handlebars");
 const sqlite3 = require("sqlite3");
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -395,32 +396,81 @@ app.post("/about/update/:id", (req, res) => {
 // PROJECTS PAGE
 //---------------
 
+//5 rows towards is based on chatGPTs code examples.
+// Custom Handlebars helper to compare two values for equality
+handlebars.registerHelper("eq", function (value1, value2, options) {
+  return value1 === value2 ? options.fn(this) : options.inverse(this);
+});
+
 // RENDER THE PROJECTS PAGE
 //--------------------------
-app.get("/projects", (req, res) => {
-  db.all("SELECT * FROM project", function (error, theProjects) {
-    if (error) {
-      const model = {
-        dbError: true,
-        theError: error,
-        projects: [],
-        isLoggedin: req.session.isLoggedin,
-        isAdmin: req.session.isAdmin,
-        name: req.session.name,
-      };
-      // renders the page with the model
-      res.render("projects.handlebars", model);
+app.get("/projects/:page?", (req, res) => {
+  const numberPerPage = 3; // Number of projects to display per page
+  let currentPage = parseInt(req.params.page) || 1; // Get the requested page from the URL parameter
+
+  // Retrieve the total number of projects from the database
+  db.get("SELECT COUNT(*) as count FROM project", (err, result) => {
+    if (err) {
+      // Handle the error
+      res.status(500).send("Error retrieving project count.");
     } else {
-      const model = {
-        dbError: false,
-        theError: "",
-        projects: theProjects,
-        isLoggedin: req.session.isLoggedin,
-        isAdmin: req.session.isAdmin,
-        name: req.session.name,
-      };
-      // renders the page with the model
-      res.render("projects.handlebars", model);
+      const totalProjects = result.count;
+      const lastPage = Math.ceil(totalProjects / numberPerPage);
+
+      // Ensure currentPage is within valid bounds
+      currentPage = Math.max(1, Math.min(currentPage, lastPage));
+
+      // Calculate the offset for the SQL query
+      const offset = (currentPage - 1) * numberPerPage;
+
+      // Query the database for projects with LIMIT and OFFSET
+      let nextPage = currentPage + 1;
+      let previousPage = currentPage - 1;
+      console.log(nextPage);
+      db.all(
+        "SELECT * FROM project LIMIT ? OFFSET ?",
+        [numberPerPage, offset],
+        (error, theProjects) => {
+          if (error) {
+            // Handle the error
+            const model = {
+              dbError: true,
+              theError: error,
+              projects: [],
+              isLoggedin: req.session.isLoggedin,
+              isAdmin: req.session.isAdmin,
+              name: req.session.name,
+              currentPage: currentPage,
+              lastPage: lastPage,
+              nextPage: nextPage,
+              previousPage: previousPage,
+            };
+            res.render("projects.handlebars", model);
+          } else {
+            // Map the projects to the page numbers
+            const pages = [];
+            for (let i = 1; i <= lastPage; i++) {
+              pages.push(i);
+            }
+
+            const model = {
+              dbError: false,
+              theError: "",
+              projects: theProjects,
+              isLoggedin: req.session.isLoggedin,
+              isAdmin: req.session.isAdmin,
+              name: req.session.name,
+              currentPage: currentPage,
+              lastPage: lastPage,
+              pages: pages, // Include the pages for pagination
+              nextPage: nextPage,
+              previousPage: previousPage,
+            };
+
+            res.render("projects.handlebars", model);
+          }
+        }
+      );
     }
   });
 });
@@ -465,7 +515,7 @@ app.get("/projects/delete/:id", (req, res) => {
 //----------------------
 
 // sends the form for a new project
-app.get("/projects/new", (req, res) => {
+app.get("/project/new", (req, res) => {
   if (req.session.isLoggedin === true && req.session.isAdmin === true) {
     const model = {
       isLoggedin: req.session.isLoggedin,
@@ -479,7 +529,7 @@ app.get("/projects/new", (req, res) => {
 });
 
 // creates a new project
-app.post("/projects/new", (req, res) => {
+app.post("/project/new", (req, res) => {
   const newp = [
     req.body.projectName,
     req.body.projectDate,
@@ -577,7 +627,7 @@ app.post("/projects/update/:id", (req, res) => {
 
 // PRODUCT OWN PAGE
 //----------------------
-app.get("/projects/:id", function (req, res) {
+app.get("/projects/view/:id", function (req, res) {
   const projectId = req.params.id;
 
   // Fetch the project details
@@ -774,6 +824,7 @@ app.get("/users", (req, res) => {
 
 // DELETE USERS
 //---------------------
+
 app.get("/users/delete/:id", (req, res) => {
   const id = req.params.id;
   if (req.session.isLoggedin === true && req.session.isAdmin === true) {
@@ -897,6 +948,7 @@ app.get("/logout", (req, res) => {
     message: "You have been hacked, LOL",
   });
 });
+
 //-------------
 // ERROR PAGE
 //-------------

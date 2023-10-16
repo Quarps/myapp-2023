@@ -173,3 +173,19 @@ a:link {
 .contact-div {
   padding: 0rem 10rem 3rem 0rem;
 }
+
+.dropdown {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column; /* Set the direction to column */
+  text-align: center;
+  background-color: rgb(39, 39, 39);
+  max-height: 10vh;
+  width: 10vh;
+  min-width: 0;
+}

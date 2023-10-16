@@ -1,11 +1,10 @@
 <div id="main">
   <div class="container">
     <h1>My projects</h1>
-    <!--p>dbError: {{dbError}}, 1sAdmin: {{isAdmin}}, name: {{name}}, is LoggedIn: {{1sLoggedIn}}</p-->
     {{#if isAdmin}}
       <div>
         <a
-          href="/projects/new"
+          href="/project/new"
           class="btn btn-primary input-group-btn"
           type="submit"
         >
@@ -22,7 +21,7 @@
         </div>
       {{else}}
         {{#each projects}}
-        <a href="/projects/{{projectID}}">
+        <a href="/projects/view/{{projectID}}">
           <div class="column col-3 card">
             <div class="card-image">
             <img
@@ -31,11 +30,11 @@
               class="img-responsive"
             />
             </div>
-            <div class="card-header">
+            <div class="card-header p-2">
               <div class="card-title h5 ">{{projectName}}</div>
               <div class="card-subtitle text-gray">{{projectDate}}</div>
             </div>
-            <div class="card-footer">
+            <div class="card-footer p-2">
               {{#if ../isAdmin}}
                 <div>
                   <a href="/projects/update/{{projectID}}" class="btn btn-primary"> Modify </a>
@@ -48,8 +47,24 @@
             </div>
           </div>
           </a>
+       <!-- paging -->
         {{/each}}
       {{/if}}
     </div>
+     <br>
+       <ul class="pagination">
+        <li class="page-item">
+          <a href="/projects/{{previousPage}}" tabindex="-1">Previous</a>
+        </li>
+        <!-- 5 rows towards is based on chatGPTs code examples. -->
+        {{#each pages}}
+          <li class="page-item {{#eq this ../currentPage}}active{{/eq}}">
+            <a href="/projects/{{this}}" class="page-link">{{this}}</a>
+          </li>
+        {{/each}}
+        <li class="page-item">
+          <a href="/projects/{{nextPage}}" tabindex="+1">Next</a>
+        </li>
+      </ul>
   </div>
-</div>
+</div> 
