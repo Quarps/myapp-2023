@@ -228,22 +228,167 @@ app.get("/", function (req, res) {
 // ABOUT PAGE
 //-------------
 
-// defines route "/about"
+// RENDERS ABOUT PAGE
+//----------------------
 app.get("/about", function (req, res) {
-  const model = {
-    isLoggedin: req.session.isLoggedin,
-    isAdmin: req.session.isAdmin,
-    name: req.session.name,
-  };
+  // Fetch all experiences from the database
+  db.all("SELECT * FROM experience", (error, experiences) => {
+    if (error) {
+      console.error("Error fetching experiences:", error);
+      // Handle the error as needed
+      experiences = [];
+    }
 
-  res.render("about.handlebars", model);
+    // Separate the experiences into work and education based on expTopic
+    const educationExperiences = experiences.filter(
+      (exp) => exp.expTopic === "education"
+    );
+    const workExperiences = experiences.filter(
+      (exp) => exp.expTopic === "work"
+    );
+
+    // Fetch competences from the database
+    db.all("SELECT * FROM competence", (error, competences) => {
+      if (error) {
+        console.error("Error fetching competences:", error);
+        // Handle the error as needed
+        competences = [];
+      }
+
+      const model = {
+        isLoggedin: req.session.isLoggedin,
+        isAdmin: req.session.isAdmin,
+        name: req.session.name,
+        educationExperience: educationExperiences,
+        workExperience: workExperiences,
+        theCompetence: competences,
+      };
+
+      res.render("about.handlebars", model);
+    });
+  });
 });
 
-//define route "/about/id"
-app.get("/about/:id", function (req, res) {
+// DELETE COMPETENCE
+//----------------------
+
+app.get("/about/delete/:id", (req, res) => {
   const id = req.params.id;
-  const model = {};
-  res.render("project.handlebars", model);
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run(
+      "DELETE FROM competence WHERE competenceID=?",
+      [id],
+      function (error, theCompetence) {
+        if (error) {
+          const model = {
+            dbError: true,
+            theError: error,
+            isLoggedin: req.session.isLoggedin,
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+          };
+          res.render("home.handlebars", model); //renders the page with the model
+        } else {
+          const model = {
+            dbError: false,
+            theError: "",
+            isLoggedin: req.session.isLoggedin,
+            isAdmin: req.session.isAdmin,
+            name: req.session.name,
+          };
+          res.render("home.handlebars", model); //renders the page with the model
+        }
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// ADD COMPETENCE
+//--------------------
+
+app.post("/about/add-competence", (req, res) => {
+  if (req.session.isAdmin) {
+    // Extract competenceName and competenceDate from req.body
+    const competenceName = req.body.competenceName;
+    const competenceDate = req.body.competenceDate;
+    // Insert the new competence into the database
+    db.run(
+      "INSERT INTO competence (competenceName, competenceDate) VALUES (?, ?)",
+      [competenceName, competenceDate],
+      (error) => {
+        if (error) {
+          console.error("Error adding competence:", error);
+          // Handle the error as needed
+        }
+        res.redirect("/about"); // Redirect back to the about page
+      }
+    );
+  } else {
+    res.redirect("/about"); // Redirect to the about page
+  }
+});
+
+// UPDATE COMPETENCE
+//--------------------
+
+app.get("/about/update/:id", (req, res) => {
+  const id = req.params.id;
+  // console.log("UPDATE: ", id);
+  db.get(
+    "SELECT * FROM competence WHERE competenceID = ?",
+    [id],
+    function (error, theCompetence) {
+      if (error) {
+        console.log("ERROR: ", error);
+        const model = {
+          dbError: true,
+          theError: error,
+          competence: {}, // Use the correct variable name here
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        // renders the page with the model
+        res.render("modifyabout.handlebars", model);
+      } else {
+        const model = {
+          dbError: false,
+          theError: "",
+          competence: theCompetence, // Use the correct variable name here
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        // renders the page with the model
+        res.render("modifyabout.handlebars", model);
+      }
+    }
+  );
+});
+
+// modifies an existing project
+app.post("/about/update/:id", (req, res) => {
+  const id = req.params.id; // gets the id from the dynamic parameter in the route
+  const newCompetence = [req.body.competenceName, req.body.competenceDate, id];
+
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run(
+      "UPDATE competence SET competenceName=?, competenceDate=? WHERE competenceID=?",
+      newCompetence,
+      (error) => {
+        if (error) {
+          console.log("ERROR: ", error);
+        } else {
+          console.log("Competence updated!");
+        }
+        res.redirect("/about");
+      }
+    );
+  } else {
+    res.redirect("/");
+  }
 });
 
 //---------------
@@ -433,31 +578,130 @@ app.post("/projects/update/:id", (req, res) => {
 // PRODUCT OWN PAGE
 //----------------------
 app.get("/projects/:id", function (req, res) {
-  db.all("SELECT * FROM project", function (error, theProjects) {
-    if (error) {
-      const model = {
-        dbError: true,
-        theError: error,
-        projects: [],
-        isLoggedin: req.session.isLoggedin,
-        isAdmin: req.session.isAdmin,
-        name: req.session.name,
-      };
-      // renders the page with the model
-      res.render("project.handlebars", model);
-    } else {
-      const model = {
-        dbError: false,
-        theError: "",
-        projects: theProjects,
-        isLoggedin: req.session.isLoggedin,
-        isAdmin: req.session.isAdmin,
-        name: req.session.name,
-      };
-      // renders the page with the model
-      res.render("project.handlebars", model);
+  const projectId = req.params.id;
+
+  // Fetch the project details
+  db.get(
+    "SELECT * FROM project WHERE projectID = ?",
+    [projectId],
+    function (error, project) {
+      if (error) {
+        console.error("Error fetching project details:", error);
+        // Handle the error as needed
+        const model = {
+          dbError: true,
+          theError: error,
+          project: {}, // Initialize an empty project object
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+          comments: [], // Initialize an empty array for comments
+        };
+        // Render the page with the model
+        res.render("project.handlebars", model);
+      } else {
+        // Fetch comments associated with the project
+        db.all(
+          "SELECT c.commentHead, c.username, c.commentBody FROM comment AS c JOIN projectComment AS pc ON c.commentID = pc.commentID WHERE pc.projectID = ?",
+          [projectId],
+          function (error, comments) {
+            if (error) {
+              console.error("Error fetching comments:", error);
+              // Handle the error as needed
+            }
+
+            const model = {
+              dbError: false,
+              theError: "",
+              project: project,
+              isLoggedin: req.session.isLoggedin,
+              isAdmin: req.session.isAdmin,
+              name: req.session.name,
+              comments: comments, // Pass the fetched comments to the template
+            };
+            // Render the page with the model
+            res.render("project.handlebars", model);
+          }
+        );
+      }
     }
-  });
+  );
+});
+
+//ADD COMMENT
+//-------------
+app.post("/projects/:id/newc", (req, res) => {
+  const projectId = req.params.id; // Get the project ID from the URL
+  const createUserName = req.session.name; // Get the logged-in user's username
+
+  if (req.session.isLoggedin && createUserName) {
+    const commentHead = req.body.commentHead;
+    const commentBody = req.body.commentBody;
+    console.log(commentHead);
+    console.log(commentBody);
+
+    // Check if the user is logged in and has a valid username
+
+    db.run(
+      "INSERT INTO comment (userName, commentHead, commentBody) VALUES (?, ?, ?)",
+      [createUserName, commentHead, commentBody],
+      function (error) {
+        if (error) {
+          console.error("Error adding comment:", error);
+          // Handle the error as needed
+        } else {
+          const commentId = this.lastID; // Get the ID of the newly inserted comment
+          db.run(
+            "INSERT INTO projectComment (projectID, commentID) VALUES (?, ?)",
+            [projectId, commentId],
+            function (error) {
+              if (error) {
+                console.error("Error associating comment with project:", error);
+                // Handle the error as needed
+              }
+            }
+          );
+        }
+      }
+    );
+
+    // Redirect back to the project page with the correct project ID
+    res.redirect(`/projects/${projectId}`);
+  } else {
+    res.redirect("/projects");
+  }
+});
+
+// DELETE COMMENT (in progress)
+//-----------------
+
+app.get("/delete-comment/:id", (req, res) => {
+  const id = req.params.id;
+  if (req.session.isLoggedin === true && req.session.isAdmin === true) {
+    db.run("DELETE FROM comment WHERE commentID = ?", [id], function (error) {
+      if (error) {
+        const model = {
+          dbError: true,
+          theError: error,
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        res.render("projects.handlebars", model);
+      } else {
+        const model = {
+          dbError: false,
+          theError: "",
+          isLoggedin: req.session.isLoggedin,
+          isAdmin: req.session.isAdmin,
+          name: req.session.name,
+        };
+        res.render("projects.handlebars", model);
+      }
+    });
+  } else {
+    res.redirect("/projects");
+  }
 });
 
 //-------------

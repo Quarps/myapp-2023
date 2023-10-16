@@ -1,8 +1,60 @@
-<div id="main">
-  <div>
-    <h1>Project</h1>
-    <div>
-      {{projectName}}
-    </div>
+<div id="main-project">
+  <div class="project-hero"><img
+      class="project-hero-img"
+      src="{{project.projectImage}}"
+      alt=""
+    /></div>
+  <div class="project-content">
+    <h1 class="text-light">{{project.projectName}}</h1>
+    <h5 class="text-gray text-italic">{{project.projectDate}}</h5>
+    <p class="text-light">
+      {{project.projectDescription}}
+    </p>
+  </div>
+  <div class="project-content project-feedback text-light">
+    <h3>Comments</h3>
+    <div class="divider"></div>
+    {{#each comments}}
+      <br />
+      <div class="commentCard">
+        <h4>{{commentHead}}</h4>
+        <h5 class="text-italic text-primary">{{userName}}</h5>
+        <br />
+        <div>{{commentBody}}</div>
+     {{#if ../isAdmin}}
+  <form action="/delete-comment/{{commentID}}" method="post">
+    <input type="submit" name="deleteComment" value="Delete">
+  </form>
+{{/if}}
+
+      </div>
+    {{/each}}
+
+    {{#if isLoggedin}}
+      <form action="/projects/{{project.projectID}}/newc" method="post">
+        <div class="divider"></div>
+        <h3>Add comment</h3>
+        <label class="form-label" for="userEmail">Title</label>
+        <input
+          class="commentHead form-input"
+          type="text"
+          placeholder="commentHead"
+          id="commentHead"
+          name="commentHead"
+          required="required"
+        />
+        <label class="form-label" for="userEmail">Comment</label>
+        <input
+          name="commentBody"
+          class="commentBody form-input"
+          type="text"
+          placeholder="commentBody"
+          id="commentBody"
+          required="required"
+        />
+        <br />
+        <input class="btn btn-primary" type="submit" value="Add" />
+      </form>
+    {{/if}}
   </div>
 </div>

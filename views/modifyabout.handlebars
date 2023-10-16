@@ -1,0 +1,31 @@
+<div id="main">
+  <div class="text-center">
+    <h1>Modify Competence</h1>
+    <div>
+      {{#if isLoggedin}}
+        <form action="/about/update/{{competence.competenceID}}" method="post">
+          {{#if isAdmin}}
+            <fieldset>
+              <label class="form-label" for="competenceName">Competence name</label>
+              <input class="form-input p-centered form-input-sm" type="text" name="competenceName" id="competenceName" value="{{competence.competenceName}}" required="required">
+              <br />
+              <label class="form-label" for="competenceDate">Competence date</label>
+              <input class="form-input p-centered form-input-sm" name="competenceDate" id="competenceDate" required="required" value="{{competence.competenceDate}}">
+              <br />
+              <!-- Add other fields specific to competence modification if needed -->
+
+            </fieldset>
+            <input class="btn btn-primary input-group-btn" type="submit" value="Modify competence">
+          </form>
+        {{else}}
+          <p>Sorry, you must be an administrator to modify a competence!</p>
+        {{/if}}
+      {{else}}
+        <p>
+          Sorry, you must be logged in to modify a competence!<br />
+          Please go to the <a href="/login">login</a> page.
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>

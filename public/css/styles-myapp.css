@@ -9,7 +9,8 @@ h1,
   color: white;
 }
 html,
-body {
+body,
+.divider-vert[data-content]::after {
   background-color: rgb(20, 20, 20);
 }
 #main {
@@ -45,6 +46,10 @@ a:link {
 /* ----------- */
 #main-home {
   width: 100%;
+  margin: 0 auto;
+  margin-bottom: 96px;
+  margin-top: 32px;
+  box-sizing: content-box;
 }
 
 .img-home {
@@ -88,6 +93,35 @@ a:link {
 /* PROJECT PAGE */
 /* ----------------- */
 
+.project-hero {
+  width: 100%;
+  max-height: 50%;
+  max-height: 500px;
+  overflow: hidden;
+}
+.project-hero-img {
+  width: 100%;
+  object-fit: cover;
+}
+.project-content {
+  width: 90%;
+  margin: 0 auto;
+  margin-bottom: 96px;
+  margin-top: 32px;
+  box-sizing: content-box;
+}
+
+/* ----------------- */
+/* CONTACT PAGE */
+/* ----------------- */
+
+.commentCard {
+  background-color: rgb(51, 51, 51);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  max-width: 500px;
+}
+
 .image-responsive {
   object-fit: none;
   width: 100%;
@@ -122,8 +156,12 @@ a:link {
   font-size: 32px;
 }
 
+.form-input {
+  width: 90%;
+}
+
 .form-input-sm {
-  width: 80%;
+  width: 70%;
   max-width: 500px;
 }
 

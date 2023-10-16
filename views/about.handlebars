@@ -1,54 +1,44 @@
 <div id="main">
-  <div>
-    {{#if isLoggedin}}
-      <h1>Add projects</h1>
-      <div>
-        <form action="/login" method="post" class="form-group">
-          <fieldset>
-            <label class="form-label " for="pn">Project name</label>
-            <input
-              class="form-input"
-              type="text"
-              name="pn"
-              id="pn"
-              required="required"
-            />
-            <br />
-            <div class="form-group">
-              <label class="form-label " for="pd">Project description</label>
-              <textarea
-                class="form-input"
-                rows="3"
-                type="text"
-                name="pd"
-                id="pd"
-                required="required"
-              />
-              </textarea>
-            </div>
-            <br />
-            <input
-              class="btn btn-primary input-group-btn"
-              type="submit"
-              value="Add"
-            />
-
-          </fieldset>
-        </form>
-      </div>
-    {{/if}}
-    <h1>List of all projects</h1>
-    <div class="container">
-      <div class="columns">
-        {{#each listProjects}}
-          <a href="/about/{{id}}" class="text-center">
-
-            <div class="card column">
-              <div class="projectName">{{name}}</div>
-            </div>
+  <div class="text-light">
+    <h1>About</h1>
+    <h3>Education experiences</h3>
+    {{#each educationExperience}}
+      <div>{{expDate}}, {{expName}}.</div>
+    {{/each}}
+    <br />
+    <br>
+    <h3>Work experiences</h3>
+    {{#each workExperience}}
+      <div>{{expDate}}, {{expName}}.</div>
+    {{/each}}
+    <br />
+    <br>
+    <h3>Competences</h3>
+    {{#each theCompetence}}
+      <div>{{competenceDate}},
+        {{competenceName}}.
+        {{#if ../isAdmin}}
+          <a  href="/about/update/{{competenceID}}" class="btn btn-primary important">
+            Modify
           </a>
-        {{/each}}
+          <a  href="/about/delete/{{competenceID}}" class="btn btn-primary important">
+            Delete
+          </a>
+        {{/if}}
       </div>
-    </div>
+    {{/each}}
+    <br>
+    {{#if isAdmin}}
+    <div class="divider"></div>
+    <h3>Add competences</h3>
+     <form action="/about/add-competence" method="POST">
+        <label class="form-label" for="competenceName">Name</label>
+        <input type="text" class="form-input" id="competenceName" name="competenceName">
+        <label class="form-label" for="competenceDate">Year</label>
+        <input type="text" class="form-input" id="competenceDate" name="competenceDate">
+        <br>
+        <input type="submit" class="btn btn-primary" value="Add">
+      </form>
+    {{/if}}
   </div>
 </div>
