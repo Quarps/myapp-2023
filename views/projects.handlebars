@@ -53,18 +53,23 @@
     </div>
      <br>
        <ul class="pagination">
+        <!-- Code UNDERNEATH inspired by Liam Melkersson -->
+        {{#if showPrevious}}
         <li class="page-item">
-          <a href="/projects/{{previousPage}}" tabindex="-1">Previous</a>
+          <a href="/projects?page={{prevPage}}" >Previous</a>
         </li>
-        <!-- 5 rows towards is based on chatGPTs code examples. -->
+        {{/if}}
         {{#each pages}}
-          <li class="page-item {{#eq this ../currentPage}}active{{/eq}}">
-            <a href="/projects/{{this}}" class="page-link">{{this}}</a>
+          <li class="page-item">
+           <a href="/projects?page={{this}}" class="page-link">{{this}}</a>
           </li>
         {{/each}}
+        {{#if showNext}}
         <li class="page-item">
-          <a href="/projects/{{nextPage}}" tabindex="+1">Next</a>
+          <a href="/projects?page={{nextPage}}" >Next</a>
         </li>
+        {{/if}}
+        <!-- Code ABOVE inspired by Liam Melkersson -->
       </ul>
   </div>
-</div> 
+</div>

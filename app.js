@@ -3,7 +3,6 @@
 //--------------
 const express = require("express"); // loads the express package
 const { engine } = require("express-handlebars"); // loads handlebars for Express
-const handlebars = require("handlebars");
 const sqlite3 = require("sqlite3");
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -21,7 +20,7 @@ const app = express(); // creates the Express application
 //----------------------------
 const db = new sqlite3.Database("Web development Portfolio.db");
 
-// VIEW ENGINE
+// MVC SETUP
 //--------------
 // defines handlebars engine
 app.engine("handlebars", engine());
@@ -42,10 +41,7 @@ app.use(express.static("public"));
 // define static directory "public"
 app.use(express.static("public"));
 
-//-------------
-// POST FORMS
-//-------------
-
+//post forms
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -369,7 +365,6 @@ app.get("/about/update/:id", (req, res) => {
   );
 });
 
-// modifies an existing project
 app.post("/about/update/:id", (req, res) => {
   const id = req.params.id; // gets the id from the dynamic parameter in the route
   const newCompetence = [req.body.competenceName, req.body.competenceDate, id];
@@ -396,84 +391,70 @@ app.post("/about/update/:id", (req, res) => {
 // PROJECTS PAGE
 //---------------
 
-//5 rows towards is based on chatGPTs code examples.
-// Custom Handlebars helper to compare two values for equality
-handlebars.registerHelper("eq", function (value1, value2, options) {
-  return value1 === value2 ? options.fn(this) : options.inverse(this);
-});
-
 // RENDER THE PROJECTS PAGE
 //--------------------------
-app.get("/projects/:page?", (req, res) => {
-  const numberPerPage = 3; // Number of projects to display per page
-  let currentPage = parseInt(req.params.page) || 1; // Get the requested page from the URL parameter
+//OBS... Code UNDERNEATH inspired by Liam Melkersson
+app.get("/projects", function (req, res) {
+  //pagination variables
+  const itemsPerPage = 3;
+  const page = (req.query.page || 1) * 1;
+  const offset = (page - 1) * itemsPerPage;
 
-  // Retrieve the total number of projects from the database
-  db.get("SELECT COUNT(*) as count FROM project", (err, result) => {
-    if (err) {
-      // Handle the error
-      res.status(500).send("Error retrieving project count.");
-    } else {
-      const totalProjects = result.count;
-      const lastPage = Math.ceil(totalProjects / numberPerPage);
+  db.all(
+    `SELECT * FROM project LIMIT ${itemsPerPage} OFFSET ${offset}`,
+    function (error, theProjects) {
+      if (error) {
+        const model = {
+          dbError: true,
+          theError: error,
+          projects: [],
+          isAdmin: req.session.isAdmin,
+          isLoggedIn: req.session.isLoggedIn,
+        };
 
-      // Ensure currentPage is within valid bounds
-      currentPage = Math.max(1, Math.min(currentPage, lastPage));
-
-      // Calculate the offset for the SQL query
-      const offset = (currentPage - 1) * numberPerPage;
-
-      // Query the database for projects with LIMIT and OFFSET
-      let nextPage = currentPage + 1;
-      let previousPage = currentPage - 1;
-      console.log(nextPage);
-      db.all(
-        "SELECT * FROM project LIMIT ? OFFSET ?",
-        [numberPerPage, offset],
-        (error, theProjects) => {
+        res.render("projects.handlebars", model);
+      } else {
+        db.get("SELECT COUNT(*) as count FROM project", function (error, row) {
           if (error) {
-            // Handle the error
-            const model = {
-              dbError: true,
-              theError: error,
-              projects: [],
-              isLoggedin: req.session.isLoggedin,
-              isAdmin: req.session.isAdmin,
-              name: req.session.name,
-              currentPage: currentPage,
-              lastPage: lastPage,
-              nextPage: nextPage,
-              previousPage: previousPage,
-            };
-            res.render("projects.handlebars", model);
-          } else {
-            // Map the projects to the page numbers
-            const pages = [];
-            for (let i = 1; i <= lastPage; i++) {
-              pages.push(i);
-            }
-
-            const model = {
-              dbError: false,
-              theError: "",
-              projects: theProjects,
-              isLoggedin: req.session.isLoggedin,
-              isAdmin: req.session.isAdmin,
-              name: req.session.name,
-              currentPage: currentPage,
-              lastPage: lastPage,
-              pages: pages, // Include the pages for pagination
-              nextPage: nextPage,
-              previousPage: previousPage,
-            };
-
-            res.render("projects.handlebars", model);
+            console.error(error);
+            return;
           }
-        }
-      );
+
+          const totalProjects = row.count;
+
+          // calculate pagination variables
+          const totalPages = Math.ceil(totalProjects / itemsPerPage);
+          const showPrevious = page > 1;
+          const showNext = page < totalPages;
+
+          // create an array of page numbers
+          const pages = [];
+          for (let i = 1; i <= totalPages; i++) {
+            pages.push(i);
+          }
+
+          const model = {
+            dbError: false,
+            theError: "",
+            projects: theProjects,
+            isAdmin: req.session.isAdmin,
+            isLoggedIn: req.session.isLoggedIn,
+            showPrevious,
+            showNext,
+            pages,
+            prevPage: page > 1 ? page - 1 : null,
+            nextPage: page < totalPages ? page + 1 : null,
+          };
+
+          console.log("PAGE: ", page); // Use the updated 'page' variable
+          console.log("Next PAGE: ", model.nextPage);
+          res.render("projects.handlebars", model);
+        });
+      }
     }
-  });
+  );
 });
+//OBS... Code ABOVE inspired by Liam Melkersson
 
 // DELETE PROJECTS PAGE
 //----------------------
