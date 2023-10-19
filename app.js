@@ -38,9 +38,6 @@ app.use(express.static("public"));
 // MIDDLEWARES
 //-------------
 
-// define static directory "public"
-app.use(express.static("public"));
-
 //post forms
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
