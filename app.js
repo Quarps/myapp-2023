@@ -7,13 +7,12 @@ const sqlite3 = require("sqlite3");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const connectSqlite3 = require("connect-sqlite3");
-const notifier = require("node-notifier");
 const bcrypt = require("bcrypt");
 //const cookieParser = require("cookie-parser");
 
 // PORT & EXPRESS
 //-----------------
-const port = 8050; // defines the port
+const port = 8080; // defines the port
 const app = express(); // creates the Express application
 
 // CONNECTION OF THE DATA BASE
@@ -125,7 +124,7 @@ app.get("/login", function (req, res) {
 // CREATE USER
 //----------------------
 
-const saltRounds = 10; // You can adjust the number of salt rounds as needed
+const saltRounds = 12; // You can adjust the number of salt rounds as needed
 
 app.post("/create-account", (req, res) => {
   const newUsername = req.body.createUserName;
@@ -186,6 +185,7 @@ app.post("/create-account", (req, res) => {
 // HOME PAGE
 //-------------
 
+//render home page
 app.get("/", function (req, res) {
   console.log("Session: ", req.session);
   db.all(
@@ -921,10 +921,6 @@ app.get("/logout", (req, res) => {
   });
   console.log("Logged out");
   res.redirect("/");
-  notifier.notify({
-    title: "Hello sir,",
-    message: "You have been hacked, LOL",
-  });
 });
 
 //-------------
